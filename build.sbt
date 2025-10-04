@@ -1,5 +1,5 @@
+Global / onChangedBuildSource := IgnoreSourceChanges
 enablePlugins(ScriptedPlugin)
-
 scriptedLaunchOpts += s"-Dproject.version=${version.value}"
 
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
@@ -7,10 +7,19 @@ ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Run(
-    List("curl -Ls https://raw.githubusercontent.com/dwijnand/sbt-extras/master/sbt > sbt && chmod 0755 sbt && sudo mv sbt /usr/local/bin/"),
-    name = Some("Install sbt")
+    List(
+      "curl -Ls https://raw.githubusercontent.com/sbt/sbt/v1.11.3/sbt > sbt"
+    ),
+    name = Some("Download sbt launcher")
   ),
-  WorkflowStep.Sbt(List("test", "scripted"))
+  WorkflowStep.Run(
+    List("chmod +x sbt"),
+    name = Some("Make sbt launcher executable")
+  ),
+  WorkflowStep.Run(
+    List("./sbt --client test scripted"),
+    name = Some("Run tests")
+  )
 )
 
 libraryDependencies ++= {
@@ -19,7 +28,6 @@ libraryDependencies ++= {
   else
     Nil
 }
-
 
 libraryDependencies += "org.specs2" %% "specs2-core" % "3.10.0" % Test
 
@@ -33,7 +41,8 @@ crossSbtVersions := Seq("1.2.7", "0.13.18")
 
 scalacOptions ++= Seq(
   "-deprecation",
-  "-encoding", "UTF-8",
+  "-encoding",
+  "UTF-8",
   "-feature",
   "-unchecked"
 )

@@ -25,5 +25,6 @@ object SbtAccess {
 
   def getTerminalWidth: Int = sbt.internal.util.JLine.usingTerminal(_.getWidth)
 
-  def inTask[T](t: Scoped, i: Initialize[T]): Initialize[T] = _root_.sbt.inTask(t, i)
+  def inTask[T](t: Scoped, i: Initialize[T]): Initialize[T] =
+    _root_.sbt.inTask(t, i)
 }

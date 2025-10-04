@@ -22,7 +22,8 @@ import Keys._
 object DependencyGraphPlugin extends AutoPlugin {
   object autoImport extends DependencyGraphKeys
 
-  override def projectSettings: Seq[Def.Setting[_]] = DependencyGraphSettings.graphSettings
+  override def projectSettings: Seq[Def.Setting[_]] =
+    DependencyGraphSettings.graphSettings
 
   override def trigger: PluginTrigger = AllRequirements
 }

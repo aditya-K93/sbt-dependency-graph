@@ -39,10 +39,17 @@ jobs:
           java-version: 21
           cache: sbt
 
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+
       - name: Check that workflows are up to date
         run: sbt '++ ${{ matrix.scala }}' githubWorkflowCheck
 
-      - name: Install sbt
-        run: 'curl -Ls https://raw.githubusercontent.com/dwijnand/sbt-extras/master/sbt > sbt && chmod 0755 sbt && sudo mv sbt /usr/local/bin/'
+      - name: Download sbt launcher
+        run: 'curl -Ls https://raw.githubusercontent.com/sbt/sbt/v1.11.3/sbt > sbt'
 
-      - run: sbt '++ ${{ matrix.scala }}' test scripted
+      - name: Make sbt launcher executable
+        run: chmod +x sbt
+
+      - name: Run tests
+        run: ./sbt --client test scripted

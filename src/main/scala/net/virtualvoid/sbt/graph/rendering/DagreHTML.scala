@@ -18,7 +18,7 @@ package net.virtualvoid.sbt.graph
 package rendering
 
 import java.io.File
-import java.net.{ URLEncoder, URI }
+import java.net.{URLEncoder, URI}
 
 import net.virtualvoid.sbt.graph.util.IOUtil
 
@@ -30,10 +30,14 @@ object DagreHTML {
     IOUtil.writeToFile(dotGraph, new File(targetDirectory, "dependencies.dot"))
 
     val graphString =
-      URLEncoder.encode(dotGraph, "utf8")
+      URLEncoder
+        .encode(dotGraph, "utf8")
         .replaceAllLiterally("+", "%20")
 
-    IOUtil.writeToFile(s"""data = "$graphString";""", new File(targetDirectory, "dependencies.dot.js"))
+    IOUtil.writeToFile(
+      s"""data = "$graphString";""",
+      new File(targetDirectory, "dependencies.dot.js")
+    )
 
     new URI(graphHTML.toURI.toString)
   }

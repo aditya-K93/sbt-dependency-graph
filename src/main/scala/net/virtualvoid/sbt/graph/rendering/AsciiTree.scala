@@ -26,14 +26,25 @@ object AsciiTree {
 
     // there should only be one root node (the project itself)
     val roots = graph.roots
-    roots.map { root ⇒
-      AsciiTreeLayout.toAscii[Module](root, node ⇒ deps.getOrElse(node.id, Seq.empty[Module]), displayModule)
-    }.mkString("\n")
+    roots
+      .map { root ⇒
+        AsciiTreeLayout.toAscii[Module](
+          root,
+          node ⇒ deps.getOrElse(node.id, Seq.empty[Module]),
+          displayModule
+        )
+      }
+      .mkString("\n")
   }
 
   def displayModule(module: Module): String =
-    red(module.id.idString +
-      module.extraInfo +
-      module.error.map(" (error: " + _ + ")").getOrElse("") +
-      module.evictedByVersion.map(_ formatted " (evicted by: %s)").getOrElse(""), module.hadError)
+    red(
+      module.id.idString +
+        module.extraInfo +
+        module.error.map(" (error: " + _ + ")").getOrElse("") +
+        module.evictedByVersion
+          .map(_ formatted " (evicted by: %s)")
+          .getOrElse(""),
+      module.hadError
+    )
 }

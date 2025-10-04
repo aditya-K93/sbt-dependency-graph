@@ -20,24 +20,39 @@ package rendering
 object Statistics {
   def renderModuleStatsList(graph: ModuleGraph): String = {
     case class ModuleStats(
-      id:                        ModuleId,
-      numDirectDependencies:     Int,
-      numTransitiveDependencies: Int,
-      selfSize:                  Option[Long],
-      transitiveSize:            Long,
-      transitiveDependencyStats: Map[ModuleId, ModuleStats]) {
-      def transitiveStatsWithSelf: Map[ModuleId, ModuleStats] = transitiveDependencyStats + (id -> this)
+        id: ModuleId,
+        numDirectDependencies: Int,
+        numTransitiveDependencies: Int,
+        selfSize: Option[Long],
+        transitiveSize: Long,
+        transitiveDependencyStats: Map[ModuleId, ModuleStats]
+    ) {
+      def transitiveStatsWithSelf: Map[ModuleId, ModuleStats] =
+        transitiveDependencyStats + (id -> this)
     }
 
     def statsFor(moduleId: ModuleId): ModuleStats = {
-      val directDependencies = graph.dependencyMap(moduleId).filterNot(_.isEvicted).map(_.id)
-      val dependencyStats = directDependencies.map(statsFor).flatMap(_.transitiveStatsWithSelf).toMap
-      val selfSize = graph.module(moduleId).jarFile.filter(_.exists).map(_.length)
+      val directDependencies =
+        graph.dependencyMap(moduleId).filterNot(_.isEvicted).map(_.id)
+      val dependencyStats = directDependencies
+        .map(statsFor)
+        .flatMap(_.transitiveStatsWithSelf)
+        .toMap
+      val selfSize =
+        graph.module(moduleId).jarFile.filter(_.exists).map(_.length)
       val numDirectDependencies = directDependencies.size
       val numTransitiveDependencies = dependencyStats.size
-      val transitiveSize = selfSize.getOrElse(0L) + dependencyStats.map(_._2.selfSize.getOrElse(0L)).sum
+      val transitiveSize = selfSize
+        .getOrElse(0L) + dependencyStats.map(_._2.selfSize.getOrElse(0L)).sum
 
-      ModuleStats(moduleId, numDirectDependencies, numTransitiveDependencies, selfSize, transitiveSize, dependencyStats)
+      ModuleStats(
+        moduleId,
+        numDirectDependencies,
+        numTransitiveDependencies,
+        selfSize,
+        transitiveSize,
+        dependencyStats
+      )
     }
 
     def format(stats: ModuleStats): String = {
@@ -46,13 +61,17 @@ object Statistics {
       val selfSize =
         stats.selfSize match {
           case Some(size) ⇒ f"${mb(size)}%7.3f"
-          case None       ⇒ "-------"
+          case None ⇒ "-------"
         }
       f"${mb(transitiveSize)}%7.3f MB $selfSize MB $numTransitiveDependencies%4d $numDirectDependencies%4d ${id.idString}%s"
     }
 
     val allStats =
-      graph.roots.flatMap(r ⇒ statsFor(r.id).transitiveStatsWithSelf).toMap.values.toSeq
+      graph.roots
+        .flatMap(r ⇒ statsFor(r.id).transitiveStatsWithSelf)
+        .toMap
+        .values
+        .toSeq
         .sortBy(s ⇒ (-s.transitiveSize, -s.numTransitiveDependencies))
 
     val header = "   TotSize    JarSize #TDe #Dep Module\n"

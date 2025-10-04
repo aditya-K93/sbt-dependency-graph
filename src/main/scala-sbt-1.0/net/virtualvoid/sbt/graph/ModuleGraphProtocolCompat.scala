@@ -1,13 +1,15 @@
 package net.virtualvoid.sbt.graph
 
-import java.io.{ ByteArrayInputStream, ByteArrayOutputStream, File }
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File}
 import java.util.Base64
 
-import sbinary.{ Format, JavaInput, JavaOutput }
-import sjsonnew.{ Builder, Unbuilder }
+import sbinary.{Format, JavaInput, JavaOutput}
+import sjsonnew.{Builder, Unbuilder}
 
 trait ModuleGraphProtocolCompat {
-  implicit def sjsonNewAndShinyTransformAndTranspileAdapterFactoryModuleImplementation[T](implicit format: Format[T]): sjsonnew.JsonFormat[T] =
+  implicit def sjsonNewAndShinyTransformAndTranspileAdapterFactoryModuleImplementation[
+      T
+  ](implicit format: Format[T]): sjsonnew.JsonFormat[T] =
     new sjsonnew.JsonFormat[T] {
       // note, how this is simpler to write than to learn any sjonnew protocol syntax
       def write[J](obj: T, builder: Builder[J]): Unit = {

@@ -28,7 +28,8 @@ object Main extends App {
   def usage: String =
     "Usage: <ivy-report-file> <output-file>"
 
-  val reportFile = args.lift(0).filter(f ⇒ new File(f).exists).getOrElse(die(usage))
+  val reportFile =
+    args.lift(0).filter(f ⇒ new File(f).exists).getOrElse(die(usage))
   val outputFile = args.lift(1).getOrElse(die(usage))
   val graph = IvyReport.fromReportFile(reportFile)
   rendering.GraphML.saveAsGraphML(graph, outputFile)

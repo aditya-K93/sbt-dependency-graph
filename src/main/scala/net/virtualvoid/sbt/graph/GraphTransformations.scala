@@ -17,10 +17,16 @@
 package net.virtualvoid.sbt.graph
 
 object GraphTransformations {
-  def reverseGraphStartingAt(graph: ModuleGraph, root: ModuleId): ModuleGraph = {
+  def reverseGraphStartingAt(
+      graph: ModuleGraph,
+      root: ModuleId
+  ): ModuleGraph = {
     val deps = graph.reverseDependencyMap
 
-    def visit(module: ModuleId, visited: Set[ModuleId]): Seq[(ModuleId, ModuleId)] =
+    def visit(
+        module: ModuleId,
+        visited: Set[ModuleId]
+    ): Seq[(ModuleId, ModuleId)] =
       if (visited(module))
         Nil
       else
@@ -33,13 +39,19 @@ object GraphTransformations {
         }
 
     val edges = visit(root, Set.empty)
-    val nodes = edges.foldLeft(Set.empty[ModuleId])((set, edge) ⇒ set + edge._1 + edge._2).map(graph.module)
+    val nodes = edges
+      .foldLeft(Set.empty[ModuleId])((set, edge) ⇒ set + edge._1 + edge._2)
+      .map(graph.module)
     ModuleGraph(nodes.toSeq, edges)
   }
 
-  def ignoreScalaLibrary(scalaVersion: String, graph: ModuleGraph): ModuleGraph = {
+  def ignoreScalaLibrary(
+      scalaVersion: String,
+      graph: ModuleGraph
+  ): ModuleGraph = {
     def isScalaLibrary(m: Module) = isScalaLibraryId(m.id)
-    def isScalaLibraryId(id: ModuleId) = id.organisation == "org.scala-lang" && id.name == "scala-library"
+    def isScalaLibraryId(id: ModuleId) =
+      id.organisation == "org.scala-lang" && id.name == "scala-library"
 
     def dependsOnScalaLibrary(m: Module): Boolean =
       graph.dependencyMap(m.id).exists(isScalaLibrary)
@@ -51,7 +63,8 @@ object GraphTransformations {
         m
     }
 
-    val newNodes = graph.nodes.map(addScalaLibraryAnnotation).filterNot(isScalaLibrary)
+    val newNodes =
+      graph.nodes.map(addScalaLibraryAnnotation).filterNot(isScalaLibrary)
     val newEdges = graph.edges.filterNot(e ⇒ isScalaLibraryId(e._2))
     ModuleGraph(newNodes, newEdges)
   }

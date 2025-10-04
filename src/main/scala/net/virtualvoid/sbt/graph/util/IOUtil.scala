@@ -16,7 +16,7 @@
 
 package net.virtualvoid.sbt.graph.util
 
-import java.io.{ OutputStream, InputStream, FileOutputStream, File }
+import java.io.{OutputStream, InputStream, FileOutputStream, File}
 import java.nio.charset.Charset
 
 import scala.annotation.tailrec

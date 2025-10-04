@@ -4,9 +4,9 @@ import java.io.File
 import java.net.URI
 
 import net.virtualvoid.sbt.graph.util.IOUtil
-import net.virtualvoid.sbt.graph.{ Module, ModuleGraph }
+import net.virtualvoid.sbt.graph.{Module, ModuleGraph}
 
-import scala.util.parsing.json.{ JSONArray, JSONObject }
+import scala.util.parsing.json.{JSONArray, JSONObject}
 
 object TreeView {
   def createJson(graph: ModuleGraph): String = {
@@ -21,7 +21,10 @@ object TreeView {
     val graphHTML = new File(targetDirectory, "tree.html")
     IOUtil.saveResource("tree.html", graphHTML)
     IOUtil.writeToFile(graphJson, new File(targetDirectory, "tree.json"))
-    IOUtil.writeToFile(s"tree_data = $graphJson;", new File(targetDirectory, "tree.data.js"))
+    IOUtil.writeToFile(
+      s"tree_data = $graphJson;",
+      new File(targetDirectory, "tree.data.js")
+    )
     new URI(graphHTML.toURI.toString)
   }
 
@@ -33,8 +36,13 @@ object TreeView {
     moduleAsJson(module, children)
   }
 
-  private def moduleAsJson(module: Module, children: List[JSONObject]): JSONObject = {
-    val eviction = module.evictedByVersion.map(version ⇒ s" (evicted by $version)").getOrElse("")
+  private def moduleAsJson(
+      module: Module,
+      children: List[JSONObject]
+  ): JSONObject = {
+    val eviction = module.evictedByVersion
+      .map(version ⇒ s" (evicted by $version)")
+      .getOrElse("")
     val error = module.error.map(err ⇒ s" (errors: $err)").getOrElse("")
     val text = module.id.idString + eviction + error
     JSONObject(Map("text" -> text, "children" -> JSONArray(children)))
