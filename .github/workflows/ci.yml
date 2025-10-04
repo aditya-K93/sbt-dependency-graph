@@ -52,4 +52,4 @@ jobs:
         run: chmod +x sbt
 
       - name: Run tests
-        run: ./sbt --client test scripted
+        run: ./sbt --client 'test; scripted'
