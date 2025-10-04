@@ -1,9 +1,9 @@
 Global / onChangedBuildSource := IgnoreSourceChanges
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
+ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 enablePlugins(ScriptedPlugin)
 scriptedLaunchOpts += s"-Dproject.version=${version.value}"
 
-ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
-ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Run(
