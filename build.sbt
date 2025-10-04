@@ -5,7 +5,13 @@ scriptedLaunchOpts += s"-Dproject.version=${version.value}"
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 
-ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
+ThisBuild / githubWorkflowBuild := Seq(
+  WorkflowStep.Run(
+    List("curl -Ls https://raw.githubusercontent.com/dwijnand/sbt-extras/master/sbt > sbt && chmod 0755 sbt && sudo mv sbt /usr/local/bin/"),
+    name = Some("Install sbt")
+  ),
+  WorkflowStep.Sbt(List("test", "scripted"))
+)
 
 libraryDependencies ++= {
   if ((pluginCrossBuild / sbtVersion).value.startsWith("0.13"))

@@ -42,4 +42,7 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt '++ ${{ matrix.scala }}' githubWorkflowCheck
 
+      - name: Install sbt
+        run: 'curl -Ls https://raw.githubusercontent.com/dwijnand/sbt-extras/master/sbt > sbt && chmod 0755 sbt && sudo mv sbt /usr/local/bin/'
+
       - run: sbt '++ ${{ matrix.scala }}' test scripted
