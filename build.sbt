@@ -8,7 +8,7 @@ ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Run(
     List(
-      "curl -Ls https://raw.githubusercontent.com/sbt/sbt/v1.11.3/sbt > sbt"
+      "curl -Ls https://raw.githubusercontent.com/sbt/sbt/v1.11.6/sbt > sbt"
     ),
     name = Some("Download sbt launcher")
   ),

@@ -46,7 +46,7 @@ jobs:
         run: sbt '++ ${{ matrix.scala }}' githubWorkflowCheck
 
       - name: Download sbt launcher
-        run: 'curl -Ls https://raw.githubusercontent.com/sbt/sbt/v1.11.3/sbt > sbt'
+        run: 'curl -Ls https://raw.githubusercontent.com/sbt/sbt/v1.11.6/sbt > sbt'
 
       - name: Make sbt launcher executable
         run: chmod +x sbt
