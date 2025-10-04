@@ -2,11 +2,13 @@ import sbt._
 
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+import com.typesafe.sbt.SbtScalariform.autoImport._
 
 object ScalariformSupport {
-  lazy val formatSettings = SbtScalariform.scalariformSettings ++ Seq(
-    ScalariformKeys.preferences in Compile := formattingPreferences,
-    ScalariformKeys.preferences in Test    := formattingPreferences
+  lazy val formatSettings = Seq(
+    scalariformAutoformat := false,
+    Compile / ScalariformKeys.preferences := formattingPreferences,
+    Test / ScalariformKeys.preferences := formattingPreferences
   )
 
   import scalariform.formatter.preferences._
@@ -15,6 +17,6 @@ object ScalariformSupport {
       .setPreference(RewriteArrowSymbols, true)
       .setPreference(AlignParameters, true)
       .setPreference(AlignSingleLineCaseStatements, true)
-      .setPreference(DoubleIndentClassDeclaration, true)
+      .setPreference(DoubleIndentConstructorArguments, true)
 
 }

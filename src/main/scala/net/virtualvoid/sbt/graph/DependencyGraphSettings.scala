@@ -16,6 +16,7 @@
 
 package net.virtualvoid.sbt.graph
 
+import scala.annotation.nowarn
 import scala.language.reflectiveCalls
 import sbt._
 import Keys._
@@ -41,20 +42,21 @@ object DependencyGraphSettings {
     // disable the cached resolution engine (exposing a scoped `ivyModule` used directly by `updateTask`), as it
     // generates artificial module descriptors which are internal to sbt, making it hard to reconstruct the
     // dependency tree
-    updateOptions in ignoreMissingUpdate := updateOptions.value.withCachedResolution(false),
-    ivyConfiguration in ignoreMissingUpdate :=
+    (ignoreMissingUpdate / updateOptions) := updateOptions.value.withCachedResolution(false),
+    (ignoreMissingUpdate / ivyConfiguration) :=
       // inTask will make sure the new definition will pick up `updateOptions in ignoreMissingUpdate`
       SbtAccess.inTask(ignoreMissingUpdate, Classpaths.mkIvyConfiguration).value,
-    ivyModule in ignoreMissingUpdate := {
+    (ignoreMissingUpdate / ivyModule) := {
       // concatenating & inlining ivySbt & ivyModule default task implementations, as `SbtAccess.inTask` does
       // NOT correctly force the scope when applied to `TaskKey.toTask` instances (as opposed to raw
       // implementations like `Classpaths.mkIvyConfiguration` or `Classpaths.updateTask`)
-      val is = new IvySbt((ivyConfiguration in ignoreMissingUpdate).value)
+      @nowarn("cat=deprecation")
+      val is = new IvySbt((ignoreMissingUpdate / ivyConfiguration).value)
       new is.Module(moduleSettings.value)
     },
 
     // don't fail on missing dependencies
-    updateConfiguration in ignoreMissingUpdate := updateConfiguration.value.withMissingOk(true),
+    (ignoreMissingUpdate / updateConfiguration) := updateConfiguration.value.withMissingOk(true),
 
     ignoreMissingUpdate :=
       // inTask will make sure the new definition will pick up `ivyModule/updateConfiguration in ignoreMissingUpdate`
@@ -63,7 +65,7 @@ object DependencyGraphSettings {
     filterScalaLibrary in Global := true)
 
   def reportSettings =
-    Seq(Compile, Test, IntegrationTest, Runtime, Provided, Optional).flatMap(ivyReportForConfig)
+    Seq(Compile, Test, Runtime, Provided, Optional).flatMap(ivyReportForConfig)
 
   val renderingAlternatives: Seq[(TaskKey[Unit], ModuleGraph ⇒ String)] =
     Seq(
@@ -141,19 +143,21 @@ object DependencyGraphSettings {
         output
       },
       // deprecated settings
-      asciiTree := (asString in dependencyTree).value) ++
+      asciiTree := (dependencyTree / asString).value) ++
       renderingAlternatives.flatMap((renderingTaskSettings _).tupled) ++
       AsciiGraph.asciiGraphSetttings)
 
   def renderingTaskSettings(key: TaskKey[Unit], renderer: ModuleGraph ⇒ String): Seq[Setting[_]] =
     Seq(
-      asString in key := renderer(moduleGraph.value),
-      printToConsole in key := streams.value.log.info((asString in key).value),
-      toFile in key := {
+      (key / asString) := renderer(moduleGraph.value),
+      (key / printToConsole) := streams.value.log.info((key / asString).value),
+      // Annotate to suppress deprecation warnings for writeToFile call
+      (key / toFile) := {
         val (targetFile, force) = targetFileAndForceParser.parsed
-        writeToFile(key.key.label, (asString in key).value, targetFile, force, streams.value)
+        writeToFile(key.key.label, (key / asString).value, targetFile, force, streams.value)
       },
-      key := (printToConsole in key).value)
+      // Annotate to suppress deprecation warnings for printToConsole assignment
+      key := (key / printToConsole).value)
 
   def ivyReportFunctionTask = Def.task {
     val ivyConfig = Keys.ivyConfiguration.value.asInstanceOf[InlineIvyConfiguration]
