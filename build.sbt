@@ -17,7 +17,7 @@ ThisBuild / githubWorkflowBuild := Seq(
     name = Some("Make sbt launcher executable")
   ),
   WorkflowStep.Run(
-    List("./sbt --client test scripted"),
+    List("./sbt --client 'test; scripted'"),
     name = Some("Run tests")
   )
 )
