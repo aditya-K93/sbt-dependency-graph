@@ -2,6 +2,11 @@ enablePlugins(ScriptedPlugin)
 
 scriptedLaunchOpts += s"-Dproject.version=${version.value}"
 
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("21"))
+ThisBuild / githubWorkflowPublishTargetBranches := Seq()
+
+ThisBuild / githubWorkflowBuild := Seq(WorkflowStep.Sbt(List("test", "scripted")))
+
 libraryDependencies ++= {
   if ((pluginCrossBuild / sbtVersion).value.startsWith("0.13"))
     Seq("com.github.mdr" %% "ascii-graphs" % "0.0.3")
